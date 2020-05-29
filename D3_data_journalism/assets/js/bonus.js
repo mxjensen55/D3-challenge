@@ -24,13 +24,6 @@ var svg = d3
 var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-// Append a div to the body to create tooltips, assign it a class
-d3
-    .select("#scatter")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
 // Initial Params
 var chosenXAxis = "poverty";
 
@@ -122,7 +115,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 (async function() {
 
     var censusData = await d3.csv("assets/data/data.csv").catch(err => console.log(err))
-    console.log(censusData)
+        // console.log(censusData)
 
     // parse data
     censusData.forEach(function(data) {
@@ -182,7 +175,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
         // .attr("font-size", 10)
         .attr("class", "stateText")
         .text(function(d) {
-            console.log(d.abbr)
+            // console.log(d.abbr)
             return d.abbr;
         });
 
