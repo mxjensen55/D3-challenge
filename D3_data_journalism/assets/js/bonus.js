@@ -24,8 +24,17 @@ var svg = d3
 var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+// Append a div to the body to create tooltips, assign it a class
+d3
+    .select("#scatter")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
 // Initial Params
 var chosenXAxis = "poverty";
+
+var chosenYAxis = "healthcare";
 
 // function used for updating x-scale var upon click on axis label
 function xScale(censusData, chosenXAxis) {
@@ -45,7 +54,7 @@ function renderAxes(newXScale, xAxis) {
     var bottomAxis = d3.axisBottom(newXScale);
 
     xAxis.transition()
-        .duration(1000)
+        .duration(650)
         .call(bottomAxis);
 
     return xAxis;
@@ -56,14 +65,13 @@ function renderAxes(newXScale, xAxis) {
 function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 
     circlesGroup.transition()
-        .duration(1000)
+        .duration(650)
         .attr("cx", d => newXScale(d[chosenXAxis]));
 
     return circlesGroup;
 }
 
-var curY = "healthcare"
-    // function used for updating circles group with new tooltip
+// function used for updating circles group with new tooltip
 function updateToolTip(chosenXAxis, circlesGroup) {
 
 
@@ -77,7 +85,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
             // Grab the state name.
             var theState = "<div>" + d.state + "</div>";
             // Snatch the y value's key and value.
-            var theY = "<div>" + curY + ": " + d[curY] + "%</div>";
+            var theY = "<div>" + chosenYAxis + ": " + d[chosenYAxis] + "%</div>";
             // If the x key is poverty
             if (chosenXAxis === "poverty") {
                 // Grab the x key and a version of the value formatted to show percentage
@@ -148,61 +156,34 @@ function updateToolTip(chosenXAxis, circlesGroup) {
         .call(leftAxis);
 
     // append initial circles
-    var circlesGroup = chartGroup.selectAll("circle").data(censusData).enter()
-        .append("circle")
+    var circlesGroup = chartGroup.selectAll("circle").data(censusData)
+        .join("circle")
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d.healthcare))
         .attr("r", 10)
         .attr("class", "stateCircle")
-        .on("mouseover", function(data, index) {
+        .on("mouseover", function(data) {
             toolTip.show(data, this);
             d3.select(this)
                 .style("stroke", "black")
                 .style("stroke-width", 2)
 
         })
-        .on("mouseout", function(data, index) {
+        .on("mouseout", function(data) {
             toolTip.hide(data, this)
             d3.select(this).style("stroke", "white")
         });
 
-    var circleText = circlesGroup.selectAll("circle").data(censusData).enter()
+    circlesGroup
         .append("text")
+
+    .attr("dx", d => xLinearScale(d[chosenXAxis]))
+        // .attr("dy", d => yLinearScale(d.healthcare) + 15 / 2.5)
+        // .attr("font-size", 10)
+        .attr("class", "stateText")
         .text(function(d) {
             console.log(d.abbr)
             return d.abbr;
-        })
-        .attr("dx", d => xLinearScale(d.poverty))
-        .attr("dy", d => yLinearScale(d.healthcare) + 15 / 2.5)
-        .attr("font-size", 10)
-        .attr("class", "stateText")
-
-    var toolTip = d3
-        .tip()
-        .attr("class", "d3-tip")
-        .offset([40, -60])
-        .html(function(d) {
-            // x key
-            var theX;
-            // Grab the state name.
-            var theState = "<div>" + d.state + "</div>";
-            // Snatch the y value's key and value.
-            var theY = "<div>" + curY + ": " + d[curY] + "%</div>";
-            // If the x key is poverty
-            if (chosenXAxis === "poverty") {
-                // Grab the x key and a version of the value formatted to show percentage
-                theX = "<div>" + chosenXAxis + ": " + d[chosenXAxis] + "%</div>";
-            } else {
-                // Otherwise
-                // Grab the x key and a version of the value formatted to include commas after every third digit.
-                theX = "<div>" +
-                    chosenXAxis +
-                    ": " +
-                    parseFloat(d[chosenXAxis]).toLocaleString("en") +
-                    "</div>";
-            }
-            // Display what we capture.
-            return theState + theX + theY;
         });
 
 
