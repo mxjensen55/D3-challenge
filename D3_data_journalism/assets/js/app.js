@@ -77,7 +77,7 @@ var chartGroup = svg.append("g")
         })
         .on("mouseout", function(data, index) {
             toolTip.hide(data, this)
-            d3.select(this).style("stroke", "white")
+            d3.select(this).style("stroke", "#e3e3e3")
         });
 
 
